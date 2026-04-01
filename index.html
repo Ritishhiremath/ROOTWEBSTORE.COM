@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOTMC | Official Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #bc13fe;
+            --accent: #00ff88;
+            --dark: #05010a;
+            --card-bg: #120a1f;
+            --error: #ff4b2b;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background-color: var(--dark); color: white; margin: 0; overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* Navbar */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(0,0,0,0.95); border-bottom: 3px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary); cursor: pointer; }
+        .discord-btn { background: #5865F2; color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .discord-btn:hover { background: #4a54c9; transform: scale(1.05); }
+        .cart-btn { background: var(--primary); border: none; color: white; padding: 12px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; position: relative; transition: 0.3s; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: white; color: black; padding: 2px 8px; border-radius: 50%; font-size: 0.7rem; font-weight: 900; }
+
+        /* Navigation */
+        .page-nav { display: flex; justify-content: center; gap: 10px; background: #0c0414; padding: 15px 0; border-bottom: 1px solid #222; position: sticky; top: 70px; z-index: 999; }
+        .nav-item { color: #888; text-decoration: none; font-weight: bold; padding: 10px 25px; border-radius: 50px; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: white; background: var(--primary); box-shadow: 0 0 15px var(--primary); }
+
+        .page { display: none; padding: 40px 8%; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Interaction Animation (Restore and Add) */
+        .card, .staff-card, .btn-add { transition: 0.3s; }
+        .card:hover, .staff-card:hover { transform: scale(1.03); border-color: var(--accent); box-shadow: 0 0 25px rgba(0, 255, 136, 0.4); }
+
+        /* Staff Dashboard Big Scale */
+        .staff-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .staff-card { background: var(--card-bg); padding: 40px; border-radius: 30px; border: 2px solid #2a0a3d; text-align: center; cursor: pointer; }
+        .staff-card i { font-size: 3.5rem; color: var(--accent); margin-bottom: 15px; }
+        .staff-role { color: var(--primary); font-weight: 900; letter-spacing: 1px; margin-top: 5px; }
+
+        /* Store Elements */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .card { background: var(--card-bg); border: 2px solid #2a0a3d; padding: 35px; border-radius: 30px; text-align: center; }
+        .price { font-size: 2.2rem; color: var(--accent); font-weight: 900; margin: 15px 0; }
+        .btn-add { width: 100%; padding: 18px; background: var(--primary); border: none; color: white; font-weight: 900; cursor: pointer; border-radius: 50px; transition: 0.3s; }
+        .btn-add:hover { background: var(--accent); color: black; box-shadow: 0 0 20px var(--accent); }
+
+        /* Popups */
+        .alert-popup { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); padding: 15px 35px; border-radius: 50px; font-weight: bold; z-index: 9999; display: none; border: 2px solid white; animation: popDown 0.4s ease; }
+        @keyframes popDown { from { top: -100px; } to { top: 25px; } }
+
+        /* Big Version Selector */
+        .version-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .version-box { background: #120a1f; padding: 60px; border-radius: 40px; border: 4px solid var(--primary); text-align: center; width: 90%; max-width: 600px; }
+        .v-btn { display: block; width: 100%; padding: 30px; margin: 20px 0; border-radius: 50px; border: none; font-size: 1.8rem; font-weight: 900; cursor: pointer; transition: 0.3s; }
+
+        /* Overlays */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05010a; z-index: 8000; display: none; padding: 40px 20px; overflow-y: auto; }
+        .checkout-container { width: 100%; max-width: 900px; margin: auto; text-align: center; }
+        
+        .cart-row { display: flex; justify-content: space-between; align-items: center; background: #1a1a2e; padding: 20px 30px; border-radius: 50px; margin-bottom: 15px; border: 1px solid #333; }
+        .remove-btn { background: var(--error); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        
+        .input-box { width: 100%; padding: 20px; margin: 12px 0; background: #111; border: 2px solid #333; color: white; border-radius: 50px; font-size: 1.1rem; box-sizing: border-box; outline: none; }
+    </style>
+</head>
+<body>
+
+<div id="msg-error" class="alert-popup" style="background: var(--error);">❌ Cart is empty!</div>
+<div id="msg-copy" class="alert-popup" style="background: var(--accent); color: black;">✅ IP Copied!</div>
+<div id="msg-utr" class="alert-popup" style="background: var(--error);">⚠️ Please enter UTR ID!</div>
+<div id="msg-details" class="alert-popup" style="background: var(--error);">⚠️ Fill all details!</div>
+
+<nav class="navbar">
+    <div class="logo" onclick="showPage('home')">ROOTMC 🟣</div>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <a href="https://discord.gg/HJ2ncmYNJm" class="discord-btn" target="_blank"><i class="fab fa-discord"></i> JOIN DISCORD 🤝</a>
+        <button class="cart-btn" onclick="tryOpenCart()">
+            <i class="fas fa-shopping-cart"></i> CART <span class="cart-count" id="cart-count">0</span>
+        </button>
+    </div>
+</nav>
+
+<div class="page-nav">
+    <div class="nav-item active" id="nav-home" onclick="showPage('home')">🏠 HOME</div>
+    <div class="nav-item" id="nav-ranks" onclick="showPage('ranks')">🏆 RANKS</div>
+    <div class="nav-item" id="nav-coins" onclick="showPage('coins')">💰 COINS</div>
+    <div class="nav-item" id="nav-staff" onclick="showPage('staff')">👥 STAFF</div>
+</div>
+
+<div id="page-home" class="page active">
+    <div style="text-align: center; margin-bottom: 50px;">
+        <img src="server_logo.png" alt="ROOTMC Logo" style="max-width: 300px; margin-bottom: 20px;"> <h1 style="font-size: 3.5rem; margin: 0; font-weight: 900;">ROOTMC STORE</h1>
+        <div style="border: 2px solid var(--accent); padding: 15px 40px; border-radius: 50px; display: inline-block; cursor: pointer; margin-top: 20px; font-weight: 900;" onclick="copyIP()">IP: play.rootmc.fun</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.03); padding: 40px; border-radius: 30px; border: 1px solid #222; line-height: 1.7;">
+        <h2 style="color:var(--accent);">🌟 About ROOTMC</h2>
+        <p>ROOTMC is a high-quality Lifesteal Minecraft server designed to deliver an intense, competitive, and enjoyable survival experience. ⚔️ In Lifesteal mode, every PvP battle matters—defeating players rewards you with extra hearts, while losing fights can cost you your own. This creates a thrilling environment where strategy, skill, and teamwork are the keys to success. ❤️</p>
+        <p>Our server focuses on providing smooth performance, balanced gameplay, and fair progression so that every player—whether beginner or experienced—can enjoy the game without issues. 🛡️ We regularly improve the server by fixing bugs, optimizing features, and introducing new updates to keep the gameplay fresh and exciting. 🔄</p>
+        <p>ROOTMC is more than just a server—it’s a community. 🤝 Players can team up, build powerful bases, trade resources, and compete to become the strongest. Whether you enjoy PvP, grinding, or exploring, there’s something here for everyone. 🌍</p>
+        <p>Our staff team is friendly, active, and always ready to help. 👨‍💻 We ensure a safe, fair, and enjoyable environment for all players. Any issues, bugs, or concerns are handled quickly and professionally to maintain the best possible experience. ✅</p>
+        <p>We are committed to delivering a lag-free, secure, and engaging server where players can have fun and grow. 🚀 Join ROOTMC today and experience Lifesteal like never before! 🎮</p>
+    </div>
+</div>
+
+<div id="page-ranks" class="page">
+    <h1 style="text-align: center; color: var(--accent); margin-bottom: 40px;">🏆 SERVER RANKS</h1>
+    <div id="ranks-grid" class="grid"></div>
+</div>
+
+<div id="page-coins" class="page">
+    <h1 style="text-align: center; color: var(--accent); margin-bottom: 40px;">💰 COIN PACKAGES</h1>
+    <div id="coins-grid" class="grid"></div>
+</div>
+
+<div id="page-staff" class="page">
+    <h1 style="text-align: center; color: var(--accent); margin-bottom: 40px;">👥 STAFF TEAM</h1>
+    <div class="staff-grid">
+        <div class="staff-card"><i class="fas fa-crown"></i><div>pranvaH</div><div class="staff-role">Owner</div></div>
+        <div class="staff-card"><i class="fas fa-user-shield"></i><div>Thirpthi</div><div class="staff-role">Co-Owner</div></div>
+        <div class="staff-card"><i class="fas fa-code"></i><div>unknown</div><div class="staff-role">Developer (Discord)</div></div>
+        <div class="staff-card"><i class="fas fa-hammer"></i><div>Ayush</div><div class="staff-role">Developer (Minecraft)</div></div>
+        <div class="staff-card"><i class="fas fa-hammer"></i><div>hunter</div><div class="staff-role">Developer (Minecraft)</div></div>
+        <div class="staff-card"><i class="fas fa-hands-helping"></i><div>Panther</div><div class="staff-role">Helper (Minecraft)</div></div>
+    </div>
+</div>
+
+<div id="confirm-overlay" class="overlay" style="background: rgba(0,0,0,0.9); justify-content: center; align-items: center; display: none;">
+    <div style="background:#111; padding:50px; border-radius:40px; border:3px solid var(--primary); text-align:center; max-width:450px;">
+        <h2 style="color:var(--accent);">Add to Cart?</h2>
+        <p id="conf-desc" style="color:#aaa; font-size:1.2rem; margin-bottom:30px;"></p>
+        <button class="btn-add" onclick="addItemNow()">YES, ADD IT</button>
+        <button class="btn-add" style="background:#333; margin-top:15px;" onclick="closeOverlay('confirm-overlay')">CANCEL</button>
+    </div>
+</div>
+
+<div id="version-overlay" class="version-overlay">
+    <div class="version-box">
+        <h2 style="color:var(--accent); font-size: 2.2rem; margin-bottom: 30px;">CHOOSE PLATFORM</h2>
+        <button class="v-btn" style="background:#f44336; color:white;" onclick="setVer('Java Edition')">JAVA EDITION</button>
+        <button class="v-btn" style="background:#2196f3; color:white;" onclick="setVer('Bedrock Edition')">BEDROCK EDITION</button>
+    </div>
+</div>
+
+<div id="payment-overlay" class="overlay">
+    <div class="checkout-container">
+        <h1 style="color:var(--primary); font-size: 3.5rem;">CHECKOUT</h1>
+        <div id="cart-render" style="margin: 40px 0; text-align: left;"></div>
+        <h2 id="final-total" style="font-size: 2.5rem; color: var(--accent);">Total: ₹0</h2>
+
+        <div id="p-step-1">
+            <input type="text" id="user-name" class="input-box" placeholder="Minecraft Username">
+            <button class="input-box" id="ver-trigger" style="text-align: left; cursor: pointer;" onclick="document.getElementById('version-overlay').style.display='flex'">Select Game Version...</button>
+            <button class="btn-add" style="margin-top: 30px; padding: 25px;" onclick="valStep1()">PROCEED TO PAYMENT</button>
+        </div>
+
+        <div id="p-step-2" style="display:none; text-align: center;">
+            <p>Scan QR to Pay with GPay/Any UPI:</p>
+            <img src="upi_qr.png" alt="UPI QR Code" style="max-width: 250px; border: 5px solid white; border-radius: 20px; margin: 20px auto;"> <div style="background:var(--primary); padding:30px; border-radius:50px; margin:40px 0; font-weight:900; font-size: 1.5rem;">ritishhiremath3856@okhdfcbank</div>
+            <button class="btn-add" onclick="showStep(3)">I HAVE PAID - NEXT</button>
+        </div>
+
+        <div id="p-step-3" style="display:none;">
+            <input type="text" id="user-utr" class="input-box" placeholder="Enter 12-digit UTR ID">
+            <button class="btn-add" onclick="finalProcess()">SUBMIT ORDER</button>
+        </div>
+
+        <div id="p-success" style="display:none;">
+            <div style="width:120px; height:120px; background:var(--accent); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:4rem; color:black; margin: 30px auto;"><i class="fas fa-check"></i></div>
+            <h1 style="color:var(--accent);">Payment Sent!</h1>
+            <p>Order submitted for manual verification.</p>
+            <button class="btn-add" style="max-width:300px;" onclick="location.reload()">FINISH</button>
+        </div>
+
+        <p onclick="closeOverlay('payment-overlay')" style="cursor:pointer; margin-top:50px; color:#444; font-weight:bold;">← GO BACK</p>
+    </div>
+</div>
+
+<script>
+    const webhook = "https://discord.com/api/webhooks/1488587373464781085/Wu7H_MNUcygM_zEkwdiSRMHSBWnuLqcqEuoQHBfdDcsx21LoWiQmDmugG5qZZbxGnVGn";
+    
+    const rankList = [
+        {id: "VIP", p: 29, d: ["⭐ 3 sethome", "💵 100k Money", "📦 VIP kit"]},
+        {id: "KING", p: 39, d: ["👑 4 sethome", "💵 150k Money", "📦 King kit"]},
+        {id: "LEGEND", p: 69, d: ["🌟 6 sethome", "💵 250k Money", "📦 Legend kit"]},
+        {id: "MVP", p: 99, d: ["🔥 8 sethome", "💵 400k Money", "🎨 Chat Color"]},
+        {id: "GOD", p: 159, d: ["⚡ 10 sethome", "💵 600k Money", "🏷️ 1 Tag"]},
+        {id: "ROOT", p: 199, d: ["💜 Unlimited sethome", "💵 1M Money", "✨ Animations"]}
+    ];
+
+    const coinList = [
+        {id: "50 Coins", p: 25}, {id: "100 Coins", p: 50}, {id: "200 Coins", p: 100},
+        {id: "300 Coins", p: 150}, {id: "500 Coins", p: 250}, {id: "800 Coins", p: 400},
+        {id: "1200 Coins", p: 600}
+    ];
+
+    let cart = [];
+    let tempItem = null;
+    let chosenVersion = "";
+
+    window.onload = () => {
+        const rG = document.getElementById('ranks-grid');
+        rankList.forEach(r => rG.innerHTML += `<div class="card"><h3>🏆 ${r.id}</h3><ul style="list-style:none;padding:0;margin:15px 0;color:#888;font-size:0.9rem;">${r.d.map(i=>`<li>${i}</li>`).join('')}</ul><div class="price">₹${r.p}</div><button class="btn-add" onclick="askAdd('${r.id}', ${r.p})">ADD TO CART</button></div>`);
+        const cG = document.getElementById('coins-grid');
+        coinList.forEach(c => cG.innerHTML += `<div class="card"><h3>🪙 ${c.id}</h3><div class="price">₹${c.p}</div><button class="btn-add" onclick="askAdd('${c.id}', ${c.p})">ADD TO CART</button></div>`);
+    };
+
+    function showPage(p) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.getElementById('page-' + p).classList.add('active');
+        document.getElementById('nav-' + p).classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function askAdd(name, price) {
+        tempItem = {name, price, uid: Date.now()};
+        document.getElementById('conf-desc').innerText = `Add ${name} to your cart for ₹${price}?`;
+        document.getElementById('confirm-overlay').style.display = 'flex';
+    }
+
+    function addItemNow() {
+        cart.push(tempItem);
+        document.getElementById('cart-count').innerText = cart.length;
+        closeOverlay('confirm-overlay');
+    }
+
+    function tryOpenCart() {
+        if(cart.length === 0) { showPop('msg-error'); return; }
+        renderCartUI();
+        document.getElementById('payment-overlay').style.display = 'flex';
+    }
+
+    function renderCartUI() {
+        const r = document.getElementById('cart-render');
+        r.innerHTML = cart.map(i => `<div class="cart-row"><span>${i.name}</span><span>₹${i.price} <button class="remove-btn" onclick="removeFromCart(${i.uid})">Remove</button></span></div>`).join('');
+        document.getElementById('final-total').innerText = "Total: ₹" + cart.reduce((s,i)=>s+i.price,0);
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(i => i.uid !== id);
+        document.getElementById('cart-count').innerText = cart.length;
+        if(cart.length === 0) closeOverlay('payment-overlay'); else renderCartUI();
+    }
+
+    function setVer(v) {
+        chosenVersion = v;
+        document.getElementById('ver-trigger').innerText = "Selected: " + v;
+        document.getElementById('version-overlay').style.display = 'none';
+    }
+
+    function copyIP() {
+        navigator.clipboard.writeText("play.rootmc.fun");
+        showPop('msg-copy');
+    }
+
+    function valStep1() {
+        if(!document.getElementById('user-name').value || !chosenVersion) { showPop('msg-details'); return; }
+        showStep(2);
+    }
+
+    function finalProcess() {
+        const utr = document.getElementById('user-utr').value;
+        if(!utr) { showPop('msg-utr'); return; }
+        fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+            embeds: [{ title: "💎 NEW ORDER", fields: [
+                {name: "Player", value: document.getElementById('user-name').value, inline: true},
+                {name: "Platform", value: chosenVersion, inline: true},
+                {name: "Items", value: cart.map(i=>i.name).join(', ')},
+                {name: "Total", value: document.getElementById('final-total').innerText},
+                {name: "UTR", value: utr}
+            ]}]
+        })}).then(() => { showStep(0); document.getElementById('p-success').style.display='block'; });
+    }
+
+    function showStep(s) {
+        ['p-step-1', 'p-step-2', 'p-step-3'].forEach((id, i) => document.getElementById(id).style.display = (i+1 === s) ? 'block' : 'none');
+    }
+
+    function showPop(id) {
+        const e = document.getElementById(id); e.style.display = 'block';
+        setTimeout(() => e.style.display = 'none', 3000);
+    }
+
+    function closeOverlay(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>
